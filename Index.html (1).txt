@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Absensi Regu 3 Siaga - Satpol PP Kab. Bangka</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif}
+  body{background:#e8e8e8;color:#222;min-height:100vh}
+  .header{background:#3a5a8c;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+
+
+  .logo-wrap svg{width:100%;height:100%}
+  .header-text h1{font-size:15px;font-weight:700;line-height:1.3}
+  .header-text p{font-size:11px;opacity:.85}
+  .nav{background:#2d4a73;display:flex;overflow-x:auto}
+  .nav button{background:none;border:none;color:#cdd8e8;padding:10px 16px;cursor:pointer;font-size:12px;white-space:nowrap;border-bottom:3px solid transparent;transition:.2s}
+  .nav button.active,.nav button:hover{color:#fff;border-bottom-color:#f0c040}
+  .main{max-width:900px;margin:0 auto;padding:16px}
+  .section{display:none}.section.active{display:block}
+  .card{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.1);padding:16px;margin-bottom:14px}
+  .card h2{font-size:14px;font-weight:700;color:#2d4a73;margin-bottom:12px;border-bottom:2px solid #dde4ef;padding-bottom:6px}
+  label{font-size:12px;color:#555;display:block;margin-bottom:4px}
+  input,select{width:100%;padding:7px 10px;border:1px solid #ccc;border-radius:5px;font-size:13px;background:#f9f9f9;margin-bottom:10px}
+  .btn{padding:8px 18px;border:none;border-radius:5px;cursor:pointer;font-size:13px;font-weight:600;margin-right:6px;margin-bottom:4px}
+  .btn-primary{background:#3a5a8c;color:#fff}.btn-primary:hover{background:#2d4a73}
+  .btn-danger{background:#c0392b;color:#fff;font-size:11px;padding:4px 10px}
+  .btn-success{background:#27ae60;color:#fff}.btn-success:hover{background:#1e8449}
+  .btn-pdf{background:#c0392b;color:#fff}.btn-pdf:hover{background:#a93226}
+  .btn-xls{background:#1e8449;color:#fff}.btn-xls:hover{background:#196f3d}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{background:#3a5a8c;color:#fff;padding:7px 8px;text-align:left}
+  td{padding:6px 8px;border-bottom:1px solid #e0e0e0}
+  tr:nth-child(even)td{background:#f4f6fb}
+  .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+  .badge-h{background:#d4efdf;color:#1e8449}
+  .badge-i{background:#fdebd0;color:#ca6f1e}
+  .badge-s{background:#d6eaf8;color:#1a5276}
+  .badge-a{background:#fadbd8;color:#922b21}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:600px){.grid2{grid-template-columns:1fr}}
+  .stat-box{background:#fff;border-radius:8px;padding:14px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+  .stat-box .num{font-size:28px;font-weight:700;color:#3a5a8c}
+  .stat-box .lbl{font-size:11px;color:#777;margin-top:2px}
+  .info{font-size:11px;color:#888;margin-bottom:8px}
+  #lap-content{font-size:12px}
+  #lap-content table th{background:#3a5a8c;color:#fff}
+  .ttd-wrap{margin-top:30px;display:flex;justify-content:flex-end}
+  .ttd-box{text-align:center;min-width:200px}
+</style>
+</head>
+<body>
+
+
+<div class="header">
+
+
+  <div class="header-text">
+    <h1>SATUAN POLISI PAMONG PRAJA<br>KABUPATEN BANGKA</h1>
+    <p>Aplikasi Absensi Regu 3 Siaga</p>
+  </div>
+</div>
+
+
+<div class="nav">
+  <button class="active" onclick="showTab('dashboard',this)">🏠 Dashboard</button>
+  <button onclick="showTab('absensi',this)">✅ Input Absensi</button>
+  <button onclick="showTab('pegawai',this)">👥 Data Pegawai</button>
+  <button onclick="showTab('rekap',this)">📊 Rekap Bulanan</button>
+  <button onclick="showTab('laporan',this)">🖨️ Laporan</button>
+</div>
+
+
+<div class="main">
+
+
+  <!-- DASHBOARD -->
+  <div class="section active" id="dashboard">
+    <div class="card">
+      <h2>📅 Informasi Hari Ini</h2>
+      <p style="font-size:13px;color:#555" id="tgl-hari"></p>
+      <p style="font-size:12px;color:#888;margin-top:4px">Regu 3 Siaga — Satpol PP Kabupaten Bangka</p>
+    </div>
+    <div class="grid2">
+      <div class="stat-box"><div class="num" id="d-total">0</div><div class="lbl">Total Pegawai</div></div>
+      <div class="stat-box"><div class="num" id="d-hadir">0</div><div class="lbl">Hadir Hari Ini</div></div>
+      <div class="stat-box"><div class="num" id="d-apel-p">0</div><div class="lbl">Apel Pagi (Hadir)</div></div>
+      <div class="stat-box"><div class="num" id="d-apel-m">0</div><div class="lbl">Apel Malam (Hadir)</div></div>
+    </div>
+  </div>
+
+
+  <!-- INPUT ABSENSI -->
+  <div class="section" id="absensi">
+    <div class="card">
+      <h2>✅ Input Absensi Harian</h2>
+      <div class="grid2">
+        <div>
+          <label>Tanggal</label>
+          <input type="date" id="abs-tgl"/>
+        </div>
+        <div>
+          <label>Nama Pegawai</label>
+          <select id="abs-nama"><option value="">-- Pilih Pegawai --</option></select>
+        </div>
+      </div>
+      <div class="grid2">
+        <div>
+          <label>Apel Pagi</label>
+          <select id="abs-apel-p">
+            <option value="Hadir">Hadir</option>
+            <option value="Izin">Izin</option>
+            <option value="Sakit">Sakit</option>
+            <option value="Alpha">Alpha</option>
+          </select>
+        </div>
+        <div>
+          <label>Apel Malam</label>
+          <select id="abs-apel-m">
+            <option value="Hadir">Hadir</option>
+            <option value="Izin">Izin</option>
+            <option value="Sakit">Sakit</option>
+            <option value="Alpha">Alpha</option>
+          </select>
+        </div>
+      </div>
+      <label>Keterangan</label>
+      <input type="text" id="abs-ket" placeholder="Opsional"/>
+      <button class="btn btn-primary" onclick="simpanAbsensi()">💾 Simpan Absensi</button>
+    </div>
+    <div class="card">
+      <h2>📋 Daftar Absensi Hari Ini</h2>
+      <div id="tbl-absensi-wrap"><p class="info">Belum ada data absensi hari ini.</p></div>
+    </div>
+  </div>
+
+
+  <!-- DATA PEGAWAI -->
+  <div class="section" id="pegawai">
+    <div class="card">
+      <h2>➕ Tambah Pegawai</h2>
+      <div class="grid2">
+        <div><label>NIP</label><input type="text" id="pgw-nip" placeholder="NIP Pegawai"/></div>
+        <div><label>Nama Lengkap</label><input type="text" id="pgw-nama" placeholder="Nama Lengkap"/></div>
+      </div>
+      <div class="grid2">
+        <div><label>Jabatan</label><input type="text" id="pgw-jabatan" placeholder="Jabatan / Pangkat"/></div>
+        <div><label>No. HP</label><input type="text" id="pgw-hp" placeholder="Nomor HP"/></div>
+      </div>
+      <button class="btn btn-primary" onclick="tambahPegawai()">➕ Tambah</button>
+    </div>
+    <div class="card">
+      <h2>👥 Daftar Pegawai Regu 3 Siaga</h2>
+      <div id="tbl-pegawai-wrap"></div>
+    </div>
+  </div>
+
+
+  <!-- REKAP BULANAN -->
+  <div class="section" id="rekap">
+    <div class="card">
+      <h2>📊 Rekap Kehadiran Bulanan</h2>
+      <div class="grid2">
+        <div>
+          <label>Bulan</label>
+          <select id="rek-bulan">
+            <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+            <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+            <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+            <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+          </select>
+        </div>
+        <div><label>Tahun</label><input type="number" id="rek-tahun" value="2026"/></div>
+      </div>
+      <button class="btn btn-primary" onclick="tampilRekap()">🔍 Tampilkan Rekap</button>
+    </div>
+    <div class="card" id="rekap-result" style="display:none">
+      <h2 id="rekap-judul">Rekap Bulan</h2>
+      <div id="tbl-rekap-wrap"></div>
+    </div>
+  </div>
+
+
+  <!-- LAPORAN -->
+  <div class="section" id="laporan">
+    <div class="card">
+      <h2>🖨️ Laporan & Unduh</h2>
+      <div class="grid2">
+        <div>
+          <label>Bulan</label>
+          <select id="lap-bulan">
+            <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+            <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+            <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+            <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+          </select>
+        </div>
+        <div><label>Tahun</label><input type="number" id="lap-tahun" value="2026"/></div>
+      </div>
+      <button class="btn btn-pdf" onclick="unduhPDF()">📄 Unduh / Cetak PDF</button>
+      <button class="btn btn-xls" onclick="unduhExcel()">📊 Unduh Excel</button>
+    </div>
+    <div class="card">
+      <h2>👁️ Pratinjau Laporan</h2>
+      <div id="lap-content"><p class="info">Pilih bulan & tahun lalu klik tombol unduh untuk pratinjau.</p></div>
+    </div>
+  </div>
+
+
+</div>
+
+
+<script>
+// ===== STATE (in-memory, no localStorage) =====
+var pegawai = [];
+var absensi = [];
+
+
+const BULAN=['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+
+window.onload=function(){
+  var today=new Date();
+  document.getElementById('abs-tgl').value=fmtDate(today);
+  document.getElementById('tgl-hari').textContent=today.toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('rek-bulan').value=today.getMonth()+1;
+  document.getElementById('lap-bulan').value=today.getMonth()+1;
+  updateDropdown();updateDashboard();renderAbsensiHariIni();renderPegawai();
+};
+
+
+function fmtDate(d){return d.toISOString().split('T')[0]}
+
+
+function showTab(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='absensi') renderAbsensiHariIni();
+  if(id==='pegawai') renderPegawai();
+  if(id==='dashboard') updateDashboard();
+}
+
+
+function badge(v){
+  var m={Hadir:'badge-h',Izin:'badge-i',Sakit:'badge-s',Alpha:'badge-a'};
+  return `<span class="badge ${m[v]||''}">${v}</span>`;
+}
+
+
+function updateDropdown(){
+  var sel=document.getElementById('abs-nama'),cur=sel.value;
+  sel.innerHTML='<option value="">-- Pilih Pegawai --</option>';
+  pegawai.forEach(p=>sel.innerHTML+=`<option value="${p.id}" ${cur==p.id?'selected':''}>${p.nama}</option>`);
+}
+
+
+function updateDashboard(){
+  document.getElementById('d-total').textContent=pegawai.length;
+  var today=fmtDate(new Date());
+  document.getElementById('d-hadir').textContent=absensi.filter(a=>a.tgl===today&&a.apelP==='Hadir').length;
+  document.getElementById('d-apel-p').textContent=absensi.filter(a=>a.tgl===today&&a.apelP==='Hadir').length;
+  document.getElementById('d-apel-m').textContent=absensi.filter(a=>a.tgl===today&&a.apelM==='Hadir').length;
+}
+
+
+function tambahPegawai(){
+  var nip=document.getElementById('pgw-nip').value.trim();
+  var nama=document.getElementById('pgw-nama').value.trim();
+  var jab=document.getElementById('pgw-jabatan').value.trim();
+  var hp=document.getElementById('pgw-hp').value.trim();
+  if(!nama){alert('Nama pegawai wajib diisi!');return;}
+  pegawai.push({id:Date.now(),nip,nama,jabatan:jab,hp});
+  ['pgw-nip','pgw-nama','pgw-jabatan','pgw-hp'].forEach(id=>document.getElementById(id).value='');
+  updateDropdown();renderPegawai();updateDashboard();
+}
+
+
+function hapusPegawai(id){
+  if(!confirm('Hapus pegawai ini?'))return;
+  pegawai=pegawai.filter(p=>p.id!==id);
+  updateDropdown();renderPegawai();updateDashboard();
+}
+
+
+function renderPegawai(){
+  var w=document.getElementById('tbl-pegawai-wrap');
+  if(!pegawai.length){w.innerHTML='<p class="info">Belum ada data pegawai.</p>';return;}
+  var h=`<table><tr><th>No</th><th>NIP</th><th>Nama</th><th>Jabatan</th><th>No. HP</th><th>Aksi</th></tr>`;
+  pegawai.forEach((p,i)=>h+=`<tr><td>${i+1}</td><td>${p.nip||'-'}</td><td>${p.nama}</td><td>${p.jabatan||'-'}</td><td>${p.hp||'-'}</td><td><button class="btn btn-danger" onclick="hapusPegawai(${p.id})">Hapus</button></td></tr>`);
+  w.innerHTML=h+'</table>';
+}
+
+
+function simpanAbsensi(){
+  var tgl=document.getElementById('abs-tgl').value;
+  var nid=document.getElementById('abs-nama').value;
+  var apelP=document.getElementById('abs-apel-p').value;
+  var apelM=document.getElementById('abs-apel-m').value;
+  var ket=document.getElementById('abs-ket').value;
+  if(!tgl||!nid){alert('Tanggal dan nama pegawai wajib diisi!');return;}
+  var pgw=pegawai.find(p=>p.id==nid);
+  var idx=absensi.findIndex(a=>a.tgl===tgl&&a.pid==nid);
+  var rec={pid:nid,nama:pgw.nama,tgl,apelP,apelM,ket};
+  if(idx>=0) absensi[idx]=rec; else absensi.push(rec);
+  renderAbsensiHariIni();updateDashboard();
+  alert('Absensi berhasil disimpan!');
+}
+
+
+function renderAbsensiHariIni(){
+  var today=document.getElementById('abs-tgl').value||fmtDate(new Date());
+  var data=absensi.filter(a=>a.tgl===today);
+  var w=document.getElementById('tbl-absensi-wrap');
+  if(!data.length){w.innerHTML='<p class="info">Belum ada absensi untuk tanggal ini.</p>';return;}
+  var h=`<table><tr><th>Nama</th><th>Apel Pagi</th><th>Apel Malam</th><th>Keterangan</th></tr>`;
+  data.forEach(a=>h+=`<tr><td>${a.nama}</td><td>${badge(a.apelP)}</td><td>${badge(a.apelM)}</td><td>${a.ket||'-'}</td></tr>`);
+  w.innerHTML=h+'</table>';
+}
+
+
+function tampilRekap(){
+  var bln=parseInt(document.getElementById('rek-bulan').value);
+  var thn=parseInt(document.getElementById('rek-tahun').value);
+  var data=absensi.filter(a=>{var d=new Date(a.tgl);return d.getMonth()+1===bln&&d.getFullYear()===thn;});
+  var rc=document.getElementById('rekap-result');rc.style.display='block';
+  document.getElementById('rekap-judul').textContent=`Rekap Kehadiran — ${BULAN[bln]} ${thn}`;
+  if(!pegawai.length){document.getElementById('tbl-rekap-wrap').innerHTML='<p class="info">Belum ada data pegawai.</p>';return;}
+  var h=`<table><tr><th>No</th><th>Nama</th><th>Hadir</th><th>Izin</th><th>Sakit</th><th>Alpha</th><th>Apel Pagi ✓</th><th>Apel Malam ✓</th></tr>`;
+  pegawai.forEach((p,i)=>{
+    var pd=data.filter(a=>a.pid==p.id);
+    h+=`<tr><td>${i+1}</td><td>${p.nama}</td>
+    <td>${pd.filter(a=>a.apelP==='Hadir'||a.apelM==='Hadir').length}</td>
+    <td>${pd.filter(a=>a.apelP==='Izin'||a.apelM==='Izin').length}</td>
+    <td>${pd.filter(a=>a.apelP==='Sakit'||a.apelM==='Sakit').length}</td>
+    <td>${pd.filter(a=>a.apelP==='Alpha'||a.apelM==='Alpha').length}</td>
+    <td>${pd.filter(a=>a.apelP==='Hadir').length}</td>
+    <td>${pd.filter(a=>a.apelM==='Hadir').length}</td></tr>`;
+  });
+  document.getElementById('tbl-rekap-wrap').innerHTML=h+'</table>';
+}
+
+
+function getRekapData(bln,thn){
+  var data=absensi.filter(a=>{var d=new Date(a.tgl);return d.getMonth()+1===bln&&d.getFullYear()===thn;});
+  return pegawai.map((p,i)=>{
+    var pd=data.filter(a=>a.pid==p.id);
+    return {
+      no:i+1,nip:p.nip||'-',nama:p.nama,jabatan:p.jabatan||'-',
+      hadir:pd.filter(a=>a.apelP==='Hadir'||a.apelM==='Hadir').length,
+      izin:pd.filter(a=>a.apelP==='Izin'||a.apelM==='Izin').length,
+      sakit:pd.filter(a=>a.apelP==='Sakit'||a.apelM==='Sakit').length,
+      alpha:pd.filter(a=>a.apelP==='Alpha'||a.apelM==='Alpha').length,
+      apelP:pd.filter(a=>a.apelP==='Hadir').length,
+      apelM:pd.filter(a=>a.apelM==='Hadir').length
+    };
+  });
+}
+
+
+function buildPreview(bln,thn){
+  var rows=getRekapData(bln,thn);
+  var tgl=new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+  var h=`<div style="text-align:center;margin-bottom:14px">
+    <p style="font-size:14px;font-weight:700;color:#2d4a73">SATUAN POLISI PAMONG PRAJA KABUPATEN BANGKA</p>
+    <p style="font-size:13px;font-weight:600">REKAPITULASI ABSENSI REGU 3 SIAGA</p>
+    <p style="font-size:12px">Bulan : ${BULAN[bln]} ${thn}</p>
+  </div>
+  <table><tr><th>No</th><th>NIP</th><th>Nama</th><th>Jabatan</th><th>Hadir</th><th>Izin</th><th>Sakit</th><th>Alpha</th><th>Apel Pagi</th><th>Apel Malam</th></tr>`;
+  rows.forEach(r=>h+=`<tr><td>${r.no}</td><td>${r.nip}</td><td>${r.nama}</td><td>${r.jabatan}</td><td>${r.hadir}</td><td>${r.izin}</td><td>${r.sakit}</td><td>${r.alpha}</td><td>${r.apelP}</td><td>${r.apelM}</td></tr>`);
+  h+=`</table>
+  <div class="ttd-wrap"><div class="ttd-box">
+    <p>Sungailiat, ${tgl}</p><p>Kepala Regu 3</p>
+    <br><br><br>
+    <p style="font-weight:700">(................................)</p>
+  </div></div>`;
+  return h;
+}
+
+
+function unduhPDF(){
+  var bln=parseInt(document.getElementById('lap-bulan').value);
+  var thn=parseInt(document.getElementById('lap-tahun').value);
+  if(!pegawai.length){alert('Belum ada data pegawai.');return;}
+  var rows=getRekapData(bln,thn);
+  var tgl=new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+  var tableRows='';
+  rows.forEach(r=>tableRows+=`<tr><td>${r.no}</td><td>${r.nip}</td><td>${r.nama}</td><td>${r.jabatan}</td><td>${r.hadir}</td><td>${r.izin}</td><td>${r.sakit}</td><td>${r.alpha}</td><td>${r.apelP}</td><td>${r.apelM}</td></tr>`);
+  var html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Laporan Absensi ${BULAN[bln]} ${thn}</title>
+  <style>
+    body{font-family:'Segoe UI',sans-serif;font-size:12px;padding:24px;color:#222}
+    .judul{text-align:center;font-size:14px;font-weight:700;color:#2d4a73;margin-bottom:4px}
+    .sub{text-align:center;font-size:12px;margin-bottom:16px}
+    table{width:100%;border-collapse:collapse}
+    th{background:#3a5a8c;color:#fff;padding:6px 8px;text-align:left;font-size:11px;border:1px solid #2d4a73}
+    td{padding:5px 8px;border:1px solid #ccc;font-size:11px}
+    tr:nth-child(even)td{background:#f4f6fb}
+    .ttd{margin-top:40px;text-align:right;padding-right:40px;font-size:12px}
+  </style></head><body>
+  <div class="judul">SATUAN POLISI PAMONG PRAJA KABUPATEN BANGKA</div>
+  <div class="sub"><b>REKAPITULASI ABSENSI REGU 3 SIAGA</b><br>Bulan : ${BULAN[bln]} ${thn}</div>
+  <table>
+    <tr><th>No</th><th>NIP</th><th>Nama</th><th>Jabatan</th><th>Hadir</th><th>Izin</th><th>Sakit</th><th>Alpha</th><th>Apel Pagi</th><th>Apel Malam</th></tr>
+    ${tableRows}
+  </table>
+  <div class="ttd"><p>Sungailiat, ${tgl}</p><p>Kepala Regu 3</p><br><br><br><p>(................................)</p></div>
+  <script>window.onload=function(){window.print();}<\/script>
+  </body></html>`;
+  var blob=new Blob([html],{type:'text/html'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.target='_blank';a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),3000);
+  document.getElementById('lap-content').innerHTML=buildPreview(bln,thn);
+}
+
+
+function unduhExcel(){
+  var bln=parseInt(document.getElementById('lap-bulan').value);
+  var thn=parseInt(document.getElementById('lap-tahun').value);
+  if(!pegawai.length){alert('Belum ada data pegawai.');return;}
+  document.getElementById('lap-content').innerHTML=buildPreview(bln,thn);
+  var rows=getRekapData(bln,thn);
+  var wsData=[
+    ['SATUAN POLISI PAMONG PRAJA KABUPATEN BANGKA'],
+    [`REKAPITULASI ABSENSI REGU 3 SIAGA — ${BULAN[bln]} ${thn}`],
+    [],
+    ['No','NIP','Nama','Jabatan','Hadir','Izin','Sakit','Alpha','Apel Pagi (Hadir)','Apel Malam (Hadir)']
+  ];
+  rows.forEach(r=>wsData.push([r.no,r.nip,r.nama,r.jabatan,r.hadir,r.izin,r.sakit,r.alpha,r.apelP,r.apelM]));
+  wsData.push([]);
+  wsData.push(['','','','','','','','','Sungailiat, '+new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})]);
+  wsData.push(['','','','','','','','','Kepala Regu 3']);
+  wsData.push([]);wsData.push([]);wsData.push([]);
+  wsData.push(['','','','','','','','','(................................)']);
+  var wb=XLSX.utils.book_new();
+  var ws=XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols']=[{wch:4},{wch:18},{wch:24},{wch:20},{wch:7},{wch:7},{wch:7},{wch:7},{wch:16},{wch:16}];
+  XLSX.utils.book_append_sheet(wb,ws,`Absensi ${BULAN[bln]} ${thn}`);
+  XLSX.writeFile(wb,`Absensi_Regu3_${BULAN[bln]}_${thn}.xlsx`);
+}
+</script>
+</body>
+</html>
