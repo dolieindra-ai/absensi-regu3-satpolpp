@@ -189,8 +189,7 @@ tbody tr:nth-child(even) td{background:#f5f7fc}
 
 <script>
 // ===== JSONBIN CONFIG =====
-var MASTER_KEY = '$2a$10$2B7xtDI4tf0oN7.5yp1AtOexvnajnB+ejy4bMY3pQJKD27l3M2npW';
-var ACCESS_KEY = '$2a$10$4bOyDmRQkJowMmPqZesg4uYe67r5vZpQhpaM0rTat1Npe2S3bGI4m';
+var MASTER_KEY = '$2a$10$2B7xtDI4tfOoN7.Syp1AtOexvnajn0xejy4bMY3pQ3KD27l3H2npW';
 var BIN_PGW = '69c0ce59b7ec241ddc93813a';
 var BIN_ABS = '69c0ce0b07ec241ddc93829f';
 var BASE_URL = 'https://api.jsonbin.io/v3/b/';
@@ -202,28 +201,17 @@ var _absData=[];
 function apiGet(binId,cb){
   fetch(BASE_URL+binId+'/latest',{
     method:'GET',
-    headers:{
-      'X-Master-Key':MASTER_KEY,
-      'X-Access-Key':ACCESS_KEY,
-      'X-Bin-Meta':'false'
-    }
+    headers:{'X-Master-Key':MASTER_KEY,'X-Bin-Meta':'false'}
   }).then(function(r){
     if(!r.ok){throw new Error('HTTP '+r.status);}
     return r.json();
-  }).then(function(d){
-    // JSONBin dengan X-Bin-Meta:false langsung return data tanpa wrapper
-    cb(null,d);
-  }).catch(function(e){cb(e);});
+  }).then(function(d){cb(null,d);}).catch(function(e){cb(e);});
 }
 
 function apiSet(binId,data,cb){
   fetch(BASE_URL+binId,{
     method:'PUT',
-    headers:{
-      'Content-Type':'application/json',
-      'X-Master-Key':MASTER_KEY,
-      'X-Access-Key':ACCESS_KEY
-    },
+    headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},
     body:JSON.stringify(data)
   }).then(function(r){
     if(!r.ok){throw new Error('HTTP '+r.status);}
