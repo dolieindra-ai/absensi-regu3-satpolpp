@@ -376,7 +376,7 @@ function onStatusChange(){
   }
 }
 
-(bln,thn){
+function getRekap(bln,thn){(bln,thn){
   var al=Object.values(_absData).filter(function(a){var d=new Date(a.tgl);return d.getMonth()+1===bln&&d.getFullYear()===thn;});
   return Object.entries(_pgwData).map(function(e,i){
     var pid=e[0],p=e[1],pd=al.filter(function(a){return a.pid===pid;});
